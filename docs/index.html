@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2026 秋招投递追踪</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0e14;
+  --surface: #131820;
+  --surface2: #1a1f2b;
+  --border: #252b36;
+  --text: #c8ccd4;
+  --text2: #8b919e;
+  --text3: #5c6370;
+  --accent: #4a9eff;
+  --accent-dim: #2a5a9e;
+  --green: #26c98b;
+  --green-bg: #0f2a20;
+  --orange: #f0a050;
+  --orange-bg: #2a1f10;
+  --red: #e0556a;
+  --red-bg: #2a1018;
+  --financial: #4a9eff;
+  --strategy: #a78bfa;
+  --analysis: #34d399;
+  --ops: #fbbf24;
+  --trainee: #f472b6;
+  --market: #fb923c;
+  --radius: 8px;
+  --radius-sm: 4px;
+  --shadow: 0 2px 8px rgba(0,0,0,0.3);
+  --transition: 0.2s cubic-bezier(0.4,0,0.2,1);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: 'Noto Sans SC', -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+.mono { font-family: 'IBM Plex Mono', monospace; }
+
+/* Layout */
+.container { max-width: 1400px; margin: 0 auto; padding: 0 20px; }
+.header {
+  padding: 24px 0 16px;
+  border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; z-index: 100;
+  background: var(--bg);
+  backdrop-filter: blur(12px);
+}
+.header-inner {
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 12px;
+}
+.header h1 {
+  font-size: 20px; font-weight: 600; letter-spacing: -0.3px;
+  color: #e8eaed;
+}
+.header .update-time {
+  font-size: 12px; color: var(--text3);
+}
+.header .update-time span { color: var(--accent); font-weight: 500; }
+
+/* Stats */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  padding: 20px 0;
+}
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  transition: all var(--transition);
+}
+.stat-card:hover { border-color: var(--text3); transform: translateY(-1px); }
+.stat-card .label { font-size: 12px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+.stat-card .value { font-size: 28px; font-weight: 700; color: #e8eaed; line-height: 1; }
+.stat-card .sub { font-size: 12px; color: var(--text2); margin-top: 4px; }
+.stat-card.accent { border-left: 3px solid var(--accent); }
+.stat-card.green { border-left: 3px solid var(--green); }
+.stat-card.orange { border-left: 3px solid var(--orange); }
+.stat-card.red { border-left: 3px solid var(--red); }
+
+/* Controls */
+.controls {
+  display: flex; gap: 10px; flex-wrap: wrap;
+  padding: 0 0 16px; align-items: center;
+}
+.search-box {
+  flex: 1; min-width: 200px;
+  position: relative;
+}
+.search-box input {
+  width: 100%; padding: 10px 14px 10px 38px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); color: var(--text);
+  font-size: 14px; font-family: inherit;
+  transition: all var(--transition);
+  outline: none;
+}
+.search-box input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(74,158,255,0.1); }
+.search-box .icon {
+  position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+  color: var(--text3); font-size: 16px;
+}
+.filter-chip {
+  padding: 8px 14px; border-radius: 20px;
+  border: 1px solid var(--border); background: var(--surface);
+  color: var(--text2); font-size: 13px; cursor: pointer;
+  transition: all var(--transition); white-space: nowrap;
+  font-family: inherit;
+}
+.filter-chip:hover { border-color: var(--text3); color: var(--text); }
+.filter-chip.active { background: var(--accent-dim); color: var(--accent); border-color: var(--accent); }
+.filter-chip .count { font-size: 11px; opacity: 0.7; }
+
+/* City filter */
+.city-filters {
+  padding: 0 0 12px; display: flex; gap: 8px; flex-wrap: wrap;
+}
+.city-chip {
+  padding: 5px 12px; border-radius: 14px;
+  border: 1px solid var(--border); background: transparent;
+  color: var(--text2); font-size: 12px; cursor: pointer;
+  transition: all var(--transition); font-family: inherit;
+}
+.city-chip:hover { border-color: var(--text3); color: var(--text); }
+.city-chip.active { background: var(--green-bg); color: var(--green); border-color: var(--green); }
+
+/* Table */
+.table-wrap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.table-scroll { overflow-x: auto; }
+table {
+  width: 100%; border-collapse: collapse;
+  font-size: 13px;
+}
+thead { background: var(--surface2); }
+th {
+  padding: 12px 14px; text-align: left;
+  font-weight: 500; color: var(--text3);
+  font-size: 11px; text-transform: uppercase;
+  letter-spacing: 0.5px; white-space: nowrap;
+  cursor: pointer; user-select: none;
+  transition: color var(--transition);
+}
+th:hover { color: var(--text); }
+th .sort-arrow { font-size: 10px; margin-left: 4px; color: var(--text3); }
+th.sorted .sort-arrow { color: var(--accent); }
+td {
+  padding: 10px 14px; border-top: 1px solid var(--border);
+  color: var(--text); white-space: nowrap;
+}
+tbody tr { transition: background var(--transition); }
+tbody tr:hover { background: var(--surface2); }
+tbody tr.urgent { background: var(--red-bg); }
+tbody tr.urgent:hover { background: #351018; }
+tbody tr.warning { background: var(--orange-bg); }
+tbody tr.warning:hover { background: #352210; }
+
+/* Company cell */
+.company-cell { font-weight: 500; color: #e8eaed; }
+.company-cell .big-badge {
+  display: inline-block; font-size: 10px; padding: 1px 6px;
+  border-radius: 10px; background: var(--accent-dim);
+  color: var(--accent); margin-left: 6px; font-weight: 600;
+  vertical-align: middle;
+}
+
+/* Category badges */
+.badge {
+  display: inline-block; padding: 2px 8px; border-radius: 10px;
+  font-size: 11px; font-weight: 500;
+}
+.badge-financial { background: rgba(74,158,255,0.15); color: var(--financial); }
+.badge-strategy { background: rgba(167,139,250,0.15); color: var(--strategy); }
+.badge-analysis { background: rgba(52,211,153,0.15); color: var(--analysis); }
+.badge-ops { background: rgba(251,191,36,0.15); color: var(--ops); }
+.badge-trainee { background: rgba(244,114,182,0.15); color: var(--trainee); }
+.badge-market { background: rgba(251,146,60,0.15); color: var(--market); }
+.badge-other { background: rgba(139,145,158,0.15); color: var(--text2); }
+
+/* Status badges */
+.status-badge {
+  display: inline-block; padding: 2px 8px; border-radius: 10px;
+  font-size: 11px; font-weight: 500;
+}
+.status-open { background: var(--green-bg); color: var(--green); }
+.status-urgent { background: var(--red-bg); color: var(--red); }
+.status-warning { background: var(--orange-bg); color: var(--orange); }
+
+/* Link */
+.link-btn {
+  display: inline-block; padding: 4px 10px; border-radius: var(--radius-sm);
+  background: rgba(74,158,255,0.1); color: var(--accent);
+  text-decoration: none; font-size: 12px; font-weight: 500;
+  transition: all var(--transition);
+}
+.link-btn:hover { background: rgba(74,158,255,0.2); }
+
+/* Empty state */
+.empty { text-align: center; padding: 60px 20px; color: var(--text3); }
+.empty .big { font-size: 48px; margin-bottom: 12px; }
+
+/* Footer */
+.footer { text-align: center; padding: 24px 0; color: var(--text3); font-size: 12px; }
+
+/* Loading */
+.loading { text-align: center; padding: 60px; color: var(--text3); }
+.spinner { display: inline-block; width: 24px; height: 24px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .header h1 { font-size: 17px; }
+  .stats { grid-template-columns: repeat(2, 1fr); }
+  .stat-card .value { font-size: 22px; }
+  .controls { flex-direction: column; }
+  th, td { padding: 8px 10px; font-size: 12px; }
+}
+
+/* Print */
+@media print {
+  body { background: white; color: black; }
+  .header, .controls, .city-filters, .footer { display: none; }
+  table { font-size: 10px; }
+  .badge, .status-badge, .link-btn { border: 1px solid #ccc; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="container header-inner">
+    <div>
+      <h1>2026 秋招投递追踪</h1>
+      <div class="update-time">每日 6:00 自动更新 · 最后更新 <span id="updateTime">-</span></div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <a href="https://github.com/Karis5208/seek-job/blob/main/秋招投递追踪表.xlsx" class="link-btn" style="background:rgba(38,201,139,0.1);color:var(--green);">📥 Excel</a>
+      <a href="https://github.com/Karis5208/seek-job" class="link-btn">GitHub</a>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="stats" id="stats"></div>
+
+  <div class="controls">
+    <div class="search-box">
+      <span class="icon">🔍</span>
+      <input type="text" id="search" placeholder="搜索公司、岗位、地点..." oninput="render()">
+    </div>
+    <button class="filter-chip active" onclick="setFilter('all')" id="filter-all">全部 <span class="count" id="count-all"></span></button>
+  </div>
+  <div class="controls" id="category-filters" style="padding-top:0;"></div>
+  <div class="city-filters" id="city-filters"></div>
+
+  <div class="table-wrap">
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th onclick="sort('company')" id="th-company">公司 <span class="sort-arrow">↕</span></th>
+            <th onclick="sort('position')" id="th-position">岗位名称 <span class="sort-arrow">↕</span></th>
+            <th style="width:80px">类别</th>
+            <th onclick="sort('location')" id="th-location">地点 <span class="sort-arrow">↕</span></th>
+            <th onclick="sort('endDate')" id="th-endDate">截止日期 <span class="sort-arrow">↕</span></th>
+            <th>备注</th>
+            <th style="width:80px">投递</th>
+          </tr>
+        </thead>
+        <tbody id="table-body"></tbody>
+      </table>
+    </div>
+    <div class="empty" id="empty" style="display:none;">
+      <div class="big">📭</div>
+      <p>没有找到匹配的岗位</p>
+    </div>
+  </div>
+
+  <div class="footer">
+    <p>每日自动更新 · 数据来源：飞书秋招合集 + 全网搜索 · 祝秋招顺利 🎓</p>
+  </div>
+</div>
+
+<script>
+// ===== DATA =====
+let allData = [];
+let currentFilter = 'all';
+let currentCity = 'all';
+let currentSort = { field: 'endDate', asc: true };
+let bigCompanies = new Set([
+  '工商银行','建设银行','农业银行','中国银行','交通银行','邮储银行','中国邮政储蓄银行',
+  '招商银行','兴业银行','浦发银行','中信银行','民生银行','平安银行','宁波银行','南京银行','杭州银行','上海银行','北京银行','广发银行','华夏银行','光大银行','浙商银行',
+  '中信证券','中金公司','华泰证券','国泰君安','海通证券','申万宏源','招商证券','广发证券','中国银河','中信建投','国信证券','东方证券','兴业证券','光大证券','平安证券','中泰证券','长江证券','财通证券','国投证券','万联证券',
+  '易方达','华夏基金','广发基金','南方基金','富国基金','嘉实基金','博时基金','招商基金','天弘基金','汇添富','中庚基金','泰康资产','中粮信托','中联基金','拾贝投资',
+  '中国人寿','中国平安','中国人保','中国太保','新华保险','泰康保险','阳光保险','中华财险','中国大地保险','瑞众保险',
+  '腾讯','阿里巴巴','字节跳动','百度','美团','京东','拼多多','网易','小米','快手','滴滴','小红书','B站','携程','同花顺','大疆','华为','联想','OPPO','vivo','蚂蚁集团',
+  '宝洁','联合利华','欧莱雅','雀巢','百事','可口可乐','玛氏','亿滋','蒙牛','伊利','安踏','李宁','沃尔玛','山姆','卡地亚','益海嘉里','康师傅',
+  '普华永道','德勤','安永','毕马威','埃森哲',
+  '万科','碧桂园','保利','华润','绿城','龙湖','招商蛇口','金地','中国铁建','中建','象屿',
+  '比亚迪','特斯拉','蔚来','理想','小鹏','宁德时代','上汽','一汽','吉利',
+  '中国移动','中国电信','中国联通','国家电网','南方电网','中粮','中化','中国诚通','中国国新','中国商飞','中国航发',
+  '成都高新投资','上海国际集团','北京首都科技发展','国新国际','南方财经','人民日报','中国邮政',
+  '上汽安吉物流','大连商品交易所','广州碳排放权交易中心','华润银行','华润集团','桂林理工大学','江苏省盐业集团','凯辉集团','策马集团',
+]);
+
+async function init() {
+  try {
+    const resp = await fetch('data.json');
+    allData = await resp.json();
+  } catch(e) {
+    allData = [];
+  }
+  document.getElementById('updateTime').textContent = allData.length > 0 ? allData[0].date || new Date().toISOString().slice(0,10) : '-';
+  buildFilters();
+  render();
+}
+
+function isBig(company) {
+  for (let bc of bigCompanies) {
+    if (company.includes(bc)) return true;
+  }
+  return false;
+}
+
+function getUrgency(endDate) {
+  if (!endDate || endDate === '招满为止' || endDate === '长期有效' || endDate === '持续招聘' || endDate === 'None') return 'none';
+  try {
+    const dl = new Date(endDate.slice(0,10));
+    const now = new Date(); now.setHours(0,0,0,0);
+    const days = Math.ceil((dl - now) / 86400000);
+    if (days <= 0) return 'urgent';
+    if (days <= 7) return 'warning';
+    return 'none';
+  } catch(e) { return 'none'; }
+}
+
+function getCategoryBadge(cat) {
+  const map = {
+    '金融': 'financial', '战略': 'strategy', '商分': 'analysis',
+    '运营': 'ops', '管培': 'trainee', '市场': 'market',
+    '产品': 'other', '咨询': 'other', '职能': 'other', '供应链': 'other', '传媒': 'other', '零售': 'other'
+  };
+  return map[cat] || 'other';
+}
+
+function buildFilters() {
+  const cats = {};
+  const cities = {};
+  allData.forEach(d => {
+    const cat = d.category || '其他';
+    cats[cat] = (cats[cat] || 0) + 1;
+    if (d.location) {
+      d.location.split(/[,，/、]/).forEach(l => {
+        const city = l.trim();
+        if (city) cities[city] = (cities[city] || 0) + 1;
+      });
+    }
+  });
+
+  // Category filters
+  const catDiv = document.getElementById('category-filters');
+  const sortedCats = Object.entries(cats).sort((a,b) => b[1]-a[1]);
+  sortedCats.forEach(([cat, count]) => {
+    const btn = document.createElement('button');
+    btn.className = 'filter-chip';
+    btn.id = 'filter-' + cat;
+    btn.innerHTML = `${cat} <span class="count">${count}</span>`;
+    btn.onclick = () => setFilter(cat);
+    catDiv.appendChild(btn);
+  });
+
+  // City filters
+  const cityDiv = document.getElementById('city-filters');
+  const topCities = Object.entries(cities).sort((a,b) => b[1]-a[1]).slice(0, 15);
+  ['北京', '上海', '深圳', '广州', '杭州', '南京', '成都', '武汉'].forEach(c => {
+    if (!cities[c]) return;
+    const btn = document.createElement('button');
+    btn.className = 'city-chip';
+    btn.id = 'city-' + c;
+    btn.textContent = c;
+    btn.onclick = () => setCity(c);
+    cityDiv.appendChild(btn);
+  });
+  const allBtn = document.createElement('button');
+  allBtn.className = 'city-chip active';
+  allBtn.id = 'city-all';
+  allBtn.textContent = '全部城市';
+  allBtn.onclick = () => setCity('all');
+  cityDiv.prepend(allBtn);
+}
+
+function setFilter(cat) {
+  currentFilter = cat;
+  document.querySelectorAll('#category-filters .filter-chip, #filter-all').forEach(b => b.classList.remove('active'));
+  const el = document.getElementById(cat === 'all' ? 'filter-all' : 'filter-' + cat);
+  if (el) el.classList.add('active');
+  render();
+}
+
+function setCity(city) {
+  currentCity = city;
+  document.querySelectorAll('.city-chip').forEach(b => b.classList.remove('active'));
+  document.getElementById('city-' + city).classList.add('active');
+  render();
+}
+
+function sort(field) {
+  if (currentSort.field === field) {
+    currentSort.asc = !currentSort.asc;
+  } else {
+    currentSort = { field, asc: field === 'endDate' };
+  }
+  document.querySelectorAll('th').forEach(th => th.classList.remove('sorted'));
+  const th = document.getElementById('th-' + field);
+  if (th) th.classList.add('sorted');
+  render();
+}
+
+function getFilteredData() {
+  const search = (document.getElementById('search').value || '').toLowerCase();
+  let filtered = allData;
+
+  if (currentFilter !== 'all') {
+    filtered = filtered.filter(d => d.category === currentFilter);
+  }
+  if (currentCity !== 'all') {
+    filtered = filtered.filter(d => (d.location || '').includes(currentCity));
+  }
+  if (search) {
+    filtered = filtered.filter(d =>
+      (d.company || '').toLowerCase().includes(search) ||
+      (d.position || '').toLowerCase().includes(search) ||
+      (d.location || '').toLowerCase().includes(search) ||
+      (d.industry || '').toLowerCase().includes(search)
+    );
+  }
+  return filtered;
+}
+
+function render() {
+  const filtered = getFilteredData();
+
+  // Sort
+  const sorted = [...filtered].sort((a, b) => {
+    let va = (a[currentSort.field] || '').toString();
+    let vb = (b[currentSort.field] || '').toString();
+    if (currentSort.field === 'endDate') {
+      // Handle special dates
+      if (va === '招满为止' || va === '长期有效' || va === '持续招聘' || !va) va = '9999-99-99';
+      if (vb === '招满为止' || vb === '长期有效' || vb === '持续招聘' || !vb) vb = '9999-99-99';
+    }
+    return currentSort.asc ? va.localeCompare(vb, 'zh') : vb.localeCompare(va, 'zh');
+  });
+
+  // Stats
+  const total = sorted.length;
+  const open = sorted.filter(d => getUrgency(d.endDate) === 'none' || getUrgency(d.endDate) === 'warning').length;
+  const urgent = sorted.filter(d => getUrgency(d.endDate) === 'urgent').length;
+  const warning = sorted.filter(d => getUrgency(d.endDate) === 'warning').length;
+  const bigCount = sorted.filter(d => isBig(d.company)).length;
+  const bjCount = sorted.filter(d => (d.location || '').includes('北京')).length;
+  const shCount = sorted.filter(d => (d.location || '').includes('上海')).length;
+
+  document.getElementById('stats').innerHTML = `
+    <div class="stat-card accent">
+      <div class="label">可投递岗位</div>
+      <div class="value">${total}</div>
+      <div class="sub">大公司 ${bigCount} 个</div>
+    </div>
+    <div class="stat-card green">
+      <div class="label">正常开放</div>
+      <div class="value">${open - warning}</div>
+      <div class="sub">⏳ 时间充裕</div>
+    </div>
+    <div class="stat-card orange">
+      <div class="label">即将截止</div>
+      <div class="value">${warning}</div>
+      <div class="sub">7天内截止</div>
+    </div>
+    <div class="stat-card red">
+      <div class="label">今日截止</div>
+      <div class="value">${urgent}</div>
+      <div class="sub">⚠️ 尽快投递</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">北京 / 上海</div>
+      <div class="value" style="font-size:22px;">${bjCount} <span style="font-size:14px;color:var(--text3);">/</span> ${shCount}</div>
+      <div class="sub">一线城市岗位</div>
+    </div>
+  `;
+
+  document.getElementById('count-all').textContent = total;
+
+  // Table
+  const tbody = document.getElementById('table-body');
+  const empty = document.getElementById('empty');
+
+  if (sorted.length === 0) {
+    tbody.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  tbody.innerHTML = sorted.map(d => {
+    const urgency = getUrgency(d.endDate);
+    const rowClass = urgency === 'urgent' ? 'urgent' : urgency === 'warning' ? 'warning' : '';
+    const big = isBig(d.company);
+    const catBadge = getCategoryBadge(d.category);
+    const endDisplay = d.endDate || '招满为止';
+    
+    let statusHtml = '';
+    if (urgency === 'urgent') {
+      statusHtml = '<span class="status-badge status-urgent">今日截止</span>';
+    } else if (urgency === 'warning') {
+      statusHtml = '<span class="status-badge status-warning">即将截止</span>';
+    } else {
+      statusHtml = '<span class="status-badge status-open">开放中</span>';
+    }
+
+    return `<tr class="${rowClass}">
+      <td><span class="company-cell">${d.company || '—'}${big ? '<span class="big-badge">大厂</span>' : ''}</span></td>
+      <td style="max-width:300px;overflow:hidden;text-overflow:ellipsis;" title="${d.position || ''}">${d.position || '—'}</td>
+      <td><span class="badge badge-${catBadge}">${d.category || '其他'}</span></td>
+      <td>${d.location || '—'}</td>
+      <td>${endDisplay}</td>
+      <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis;" title="${d.note || ''}">${d.note || '—'}</td>
+      <td>${d.link ? `<a href="${d.link}" target="_blank" class="link-btn">投递</a>` : '—'}</td>
+    </tr>`;
+  }).join('');
+}
+
+init();
+</script>
+</body>
+</html>

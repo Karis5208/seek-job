@@ -197,5 +197,19 @@ blines.append('*每日自动更新 · 祝秋招顺利！*')
 with open('/workspace/docs/大公司投递表.md', 'w', encoding='utf-8') as f:
     f.write('\n'.join(blines))
 
-print(f'已生成 {len(cats_sorted)+1} 个分类文件 + 大公司表')
+# 导出 JSON 供前端页面使用
+import json
+json_data = []
+for row in mapped_rows:
+    company, job, category, location, edu, _, apply, start, end, source, collect_date, note, status = row
+    json_data.append({
+        "company": company, "position": job, "category": category,
+        "location": location, "edu": edu, "link": apply,
+        "startDate": start, "endDate": end, "source": source,
+        "date": collect_date, "note": note, "status": status
+    })
+with open('/workspace/docs/data.json', 'w', encoding='utf-8') as f:
+    json.dump(json_data, f, ensure_ascii=False, indent=2)
+
+print(f'已生成 {len(cats_sorted)+1} 个分类文件 + 大公司表 + data.json')
 print(f'总岗位: {len(mapped_rows)} | 大公司: {len(big_items)}')
