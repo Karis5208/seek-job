@@ -274,11 +274,11 @@ tbody tr.warning:hover { background: #352210; }
           <tr>
             <th onclick="sort('company')" id="th-company">公司 <span class="sort-arrow">↕</span></th>
             <th onclick="sort('position')" id="th-position">岗位名称 <span class="sort-arrow">↕</span></th>
-            <th style="width:80px">类别</th>
-            <th onclick="sort('location')" id="th-location">地点 <span class="sort-arrow">↕</span></th>
+            <th style="width:60px">投递</th>
+            <th style="width:70px">类别</th>
+            <th onclick="sort('location')" id="th-location" style="width:70px">地点 <span class="sort-arrow">↕</span></th>
             <th onclick="sort('endDate')" id="th-endDate">截止日期 <span class="sort-arrow">↕</span></th>
-            <th>备注</th>
-            <th style="width:80px">投递</th>
+            <th style="width:90px">备注</th>
           </tr>
         </thead>
         <tbody id="table-body"></tbody>
@@ -534,12 +534,12 @@ function render() {
 
     return `<tr class="${rowClass}">
       <td><span class="company-cell">${d.company || '—'}${big ? '<span class="big-badge">大厂</span>' : ''}</span></td>
-      <td style="max-width:300px;overflow:hidden;text-overflow:ellipsis;" title="${d.position || ''}">${d.position || '—'}</td>
-      <td><span class="badge badge-${catBadge}">${d.category || '其他'}</span></td>
-      <td>${d.location || '—'}</td>
-      <td>${endDisplay}</td>
-      <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis;" title="${d.note || ''}">${d.note || '—'}</td>
+      <td style="max-width:220px;overflow:hidden;text-overflow:ellipsis;" title="${d.position || ''}">${d.position || '—'}</td>
       <td>${d.link ? `<a href="${d.link}" target="_blank" class="link-btn">投递</a>` : '—'}</td>
+      <td><span class="badge badge-${catBadge}">${d.category || '其他'}</span></td>
+      <td style="max-width:70px;overflow:hidden;text-overflow:ellipsis;" title="${d.location || ''}">${d.location || '—'}</td>
+      <td>${endDisplay}</td>
+      <td style="max-width:90px;overflow:hidden;text-overflow:ellipsis;" title="${d.note || ''}">${d.note || '—'}</td>
     </tr>`;
   }).join('');
 }
